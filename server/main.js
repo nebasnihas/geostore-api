@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import {Stores} from "../collections/collection";
-
+import {Leaderboard} from "../collections/collection";
 
 Meteor.startup(() => {
   // code to run on server at startup
@@ -42,6 +42,36 @@ Meteor.startup(() => {
             };
 
         }
-    })
-    
+    });
+
+    //Endpoints for leaderboard
+    Api.addRoute('leaderboard', {
+        get:function () {
+            return Leaderboard.find().fetch();
+        }
+    });
+
+    Api.addRoute('leaderboard/:user', {
+        put:function () {
+            if(Leaderboard.update({username:this.urlParams.user},{$inc: {score: 1}})){
+                return {status: 'success', data: {message: 'Leaderboard updated'}};
+            }
+            return {
+                statusCode: 404,
+                body: {status: 'fail', message: 'Leaderboard update failed'}
+            };
+
+        },
+        post:function () {
+            var collection = {username:this.urlParams.user, score:0};
+            if(Leaderboard.insert(collection)){
+                return {status: 'success', data: {message: 'Leaderboard added'}};
+            }
+            return {
+                statusCode: 404,
+                body: {status: 'fail', message: 'Leaderboard add failed'}
+            };
+        }
+    });
+
 });
