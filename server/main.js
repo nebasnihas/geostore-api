@@ -57,7 +57,7 @@ Meteor.startup(() => {
     //Endpoints for leaderboard
     Api.addRoute('leaderboard', {
         get:function () {
-            return Leaderboard.find().fetch();
+            return Leaderboard.find({}, {sort:{score:-1}}).fetch();
         }
     });
 
