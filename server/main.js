@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import {Stores} from "../collections/collection";
 import {Leaderboard} from "../collections/collection";
+import {Machine} from "../collections/collection";
 
 Meteor.startup(() => {
   // code to run on server at startup
@@ -11,10 +12,19 @@ Meteor.startup(() => {
         prettyJson: true
     });
 
-    // Necessary endpoints for store
-    Api.addRoute('stores', {
+    //Machine Id for device
+    Api.addRoute('machine', {
        get:function () {
-           return Stores.find().fetch();
+           var idJson = Machine.find({field:'machine'});
+           Machine.update({field:'machine'},{$inc: {id: 1}});
+           return idJson;
+       }
+    });
+
+    // Necessary endpoints for store
+    Api.addRoute('stores/:user', {
+       get:function () {
+           return Stores.find({user : {$ne: this.urlParams.user}}).fetch();
        }
     });
     Api.addRoute('stores/:sqlId/:user', {
